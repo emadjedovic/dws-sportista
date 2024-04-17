@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Date
 from sqlalchemy.orm import relationship
 from datetime import datetime
 
@@ -7,9 +7,26 @@ from .database import Base
 class Korisnik(Base):
     __tablename__ = "korisnici_tabela"
 
+    id = Column(Integer, primary_key = True, autoincrement = True)
+    ime = Column(String, nullable = False)
+    prezime = Column(String, nullable = False)
+    datum_rodenja = Column(Date, nullable = False)
+    lokacija = Column(String, nullable = False)
+    sport = Column(list[String], nullable = False)
+    mail = Column(String, unique = True) #ne mogu 2 korisnika imati isti mail, niti se registrovati ukoliko je mail vec zauzet
+    sifra = Column(String, nullable = False)
 
+    #Poslovni tip profil
+    da_li_je_poslovni = Column(bool, default = False)
+    vlasnik_terena = relationship("Tereni", back_populates = "korisnik")
+    #Jedan vlasnik vise terena. Vise terena jedan vlasnik
+
+"""
 class Poslovni(Base):
     __tablename__ = "poslovni_tabela"
+
+                     Za diskusiju: sadržati Tabelu poslovni ili ukloniti
+"""
 
 class Tereni(Base):
     __tablename__ = "tereni_tabela"
@@ -19,6 +36,8 @@ class Tereni(Base):
     lokacija = Column(String, nullable=False)
     cijena = Column(Integer, nullable=False)
     ocjene = Column(list[Integer], nullable=True) #lista intova od 0-5?? #napraviti posebnu tabelu s ocjenama? UserGradeField
+
+    korisnik = relationship ("Korisnik", back_populates = "vlasnik_terena")
 
 class Termini(Base):
     __tablename__ = "termini_tabela"
@@ -64,7 +83,7 @@ class Timovi(Base):
 
 # class VrstaSporta(Base):
 
-# class MasterTerena(Base):
+# class MaterijalTerena(Base):
 
 # ostale tabele...
 
