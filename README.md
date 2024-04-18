@@ -1,1 +1,1 @@
-# dws-sportista
+# Specifikacije
