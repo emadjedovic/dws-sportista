@@ -5,30 +5,32 @@ from datetime import datetime
 from .database import Base
 
 class Korisnik(Base):
-    __tablename__ = "korisnici_tabela"
+    __tablename__ = "korisnik_tabela"
 
     id = Column(Integer, primary_key = True, autoincrement = True)
+    sifra = Column(String, nullable = False)
     ime = Column(String, nullable = False)
     prezime = Column(String, nullable = False)
     datum_rodenja = Column(Date, nullable = False)
     lokacija = Column(String, nullable = False)
-    sport = Column(list[String], nullable = False)
-    mail = Column(String, unique = True) #ne mogu 2 korisnika imati isti mail, niti se registrovati ukoliko je mail vec zauzet
-    sifra = Column(String, nullable = False)
+    mail = Column(String, unique = True, index=True) #ne mogu 2 korisnika imati isti mail, niti se registrovati ukoliko je mail vec zauzet, mozemo vrsiti pretragu po ovom polju
     telefon = Column(String, nullable=True)
 
-    #Poslovni tip profil
-    da_li_je_poslovni = Column(bool, default = False)
-    vlasnik_terena = relationship("Tereni", back_populates = "korisnik")
-    #Jedan vlasnik vise terena. Vise terena jedan vlasnik
 
-# Ema: konsultovala sam se s kolegom od prosle godine koji kaze da je jedino logicno imati
-# obje klase "korisnik" i "poslovni" tako da treba nam ovo!!
-class Poslovni(Base):
-    __tablename__ = "poslovni_tabela"
-    # Ema: bolje mozda "Vlasnik" umjesto "Poslovni?"
+class Vlasnik(Base):
+    __tablename__ = "vlasnik_tabela"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key = True, autoincrement = True)
+    sifra = Column(String, nullable = False)
+    ime = Column(String, nullable = False)
+    prezime = Column(String, nullable = False)
+    datum_rodenja = Column(Date, nullable = False)
+    lokacija = Column(String, nullable = False)
+    mail = Column(String, unique = True, index=True)
+    telefon = Column(String, nullable=True)
+
+    # one to many
+    tereni = relationship("Teren", back_populates="vlasnik")
 
 class Sport(Base):
 
@@ -37,74 +39,78 @@ class Sport(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     naziv = Column(String, nullable=False)
 
-class Tereni(Base):
-    __tablename__ = "tereni_tabela"
+    # one to one
+    teren = relationship("Teren", back_populates="sport")
+
+class Teren(Base):
+    __tablename__ = "teren_tabela"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    id_vlasnik = Column(Integer, ForeignKey("poslovni_tabela.id"), nullable=False) # dodano (Ema)
+    vlasnik_id = Column(Integer, ForeignKey("vlasnik_tabela.id"), nullable=False)
+    sport_id = Column(Integer, ForeignKey("sport_tabela.id"), nullable=False)
+    ocjene_id = Column(Integer, ForeignKey("ocjene_tabela.id"), nullable=False)
     vrsta = Column(String, nullable=False)
     lokacija = Column(String, nullable=False)
     cijena = Column(Integer, nullable=False)
-    sport_id = Column(Integer, ForeignKey("sport_tabela.id"), nullable=False)
-    ocjena = Column(Integer, nullable=False) # ocjenu izracunati kao prosjek svih ocjena?
 
-    korisnik = relationship ("Korisnik", back_populates = "vlasnik_terena")
+    # one to many
+    vlasnik = relationship("Vlasnik", back_populates="tereni")
+    # one to one
+    sport = relationship("Sport", back_populates="teren")
+    # one to one
+    ocjene = relationship("Ocjene", back_populates="teren")
+    # one to many
+    termini = relationship("Termin", back_populates="teren")
 
 class Ocjene(Base):
     __tablename__ = "ocjene_tabela"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    korisnik_id = Column(Integer, ForeignKey("korisnici_tabela.id"), nullable=False)
-    teren_id = Column(Integer, ForeignKey("tereni_tabela.id"), nullable=False)
+    korisnik_id = Column(Integer, ForeignKey("korisnik_tabela.id"), nullable=False)
+    teren_id = Column(Integer, ForeignKey("teren_tabela.id"), nullable=False)
     ocjena = Column(Integer, nullable=False)
 
-class Termini(Base):
-    __tablename__ = "termini_tabela"
+    # one to one
+    teren = relationship("Teren", back_populates="ocjene")
+
+class Termin(Base):
+    __tablename__ = "termin_tabela"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    teren_id = Column(Integer, ForeignKey("tereni_tabela.id"), nullable=False)
-    tim_id = Column(Integer, ForeignKey("timovi_tabela.id"), nullable=False)
+    teren_id = Column(Integer, ForeignKey("teren_tabela.id"), nullable=False)
+    tim_id = Column(Integer, ForeignKey("tim_tabela.id"), nullable=False)
     vrijeme_pocetka = Column(datetime, nullable=False)
     vrijeme_kraja = Column(datetime, nullable=False)
-    trajanje_igre_u_min = Column(Integer) # izracunati ovo kao vrijeme_pocetka - vrijeme_kraja
     je_li_privatni = Column(Boolean, nullable=False)
 
-    teren = relationship("Tereni", back_populates="termini")
-    # Jedan teren ima više termina. Jedan termin ima jedan teren.
-    tim = relationship("Timovi", back_populates="teren")
-    # Jedan termin ima jedan tim. Jedan tim rezerviše jedan termin.
+    # one to many
+    teren = relationship("Teren", back_populates="termini")
+    # one to many
+    tim = relationship("Tim", back_populates="termini")
 
-class Timovi(Base):
-    __tablename__ = "timovi_tabela"
+# ne trebaju nam ovdje tereni, samo termini? imamo terene u sklopu termina
+class Tim(Base):
+    __tablename__ = "tim_tabela"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     sport_id = Column(Integer, ForeignKey("sport_tabela.id"), nullable=False)
-    teren_id = Column(Integer, ForeignKey("tereni_tabela.id"), nullable=False)
     termin_id = Column(Integer, ForeignKey("termin_tabela.id"), nullable=False)
     broj_igraca = Column(Integer) # dinamicki se mijenja?
     nivo_vjestine = Column(Integer, nullable=False) # Koliki nivo vjestine korisnici moraju imati da bi mogli biti u timu
     lokacija_tima = Column(String, nullable=False)
     broj_slobodnih_mjesta = Column(Integer) # dinamicki se mijenja?
 
-    teren = relationship("Tereni", back_populates="timovi")
-    """
-    Jedan tim rezerviše jedan teren.
-    Jedan teren je za više timova.
-    """
-
-    termin = relationship("Termini", back_populates="tim")
-    """
-    Jedan tim rezerviše jedan termin.
-    Jedan termin je za jedan tim.
-    """
+    # one to many
+    termini = relationship("Termin", back_populates="tim")
 
 # Tabela kreirana zbog many-to-many veze izmedju korisnika i tima
-class KorisniciTimovi(Base):
+# jedan korisnik moze biti u vise timova
+class KorisnikTim(Base):
     
-    __tablename__ = "korisnici_timovi_tabela"
+    __tablename__ = "korisnik_tim_tabela"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    korisnik_id = Column(Integer, ForeignKey("korisnici_tabela.id"), nullable=False)
-    tim_id = Column(Integer, ForeignKey("timovi_tabela.id"), nullable=False)
+    korisnik_id = Column(Integer, ForeignKey("korisnik_tabela.id"), nullable=False)
+    tim_id = Column(Integer, ForeignKey("tim_tabela.id"), nullable=False)
 
 
