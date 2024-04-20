@@ -92,7 +92,8 @@ class Tim(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     sport_id = Column(Integer, ForeignKey("sport_tabela.id"), nullable=False)
-    broj_igraca = Column(Integer) # dinamicki se mijenja?
+    potreban_broj_igraca = Column(Integer) # dinamicki se mijenja?
+    max_broj_igraca = Column(Integer, nullable=False)
     nivo_vjestine = Column(Integer, nullable=False) # Koliki nivo vjestine korisnici moraju imati da bi mogli biti u timu
     lokacija_tima = Column(String, nullable=False)
     broj_slobodnih_mjesta = Column(Integer) # dinamicki se mijenja?
