@@ -3,18 +3,20 @@ from sqlalchemy.orm import relationship
 
 from .database import Base
 
+
 class Korisnik(Base):
     __tablename__ = "korisnik_tabela"
 
-    id = Column(Integer, primary_key = True, autoincrement = True)
-    sifra = Column(String, nullable = False)
-    ime = Column(String, nullable = False)
-    prezime = Column(String, nullable = False)
-    datum_rodjenja = Column(Date, nullable = False)
-    lokacija = Column(String, nullable = False)
-    mail = Column(String, unique = True, index=True) #ne mogu 2 korisnika imati isti mail, niti se registrovati ukoliko je mail vec zauzet, mozemo vrsiti pretragu po ovom polju
+    id = Column(Integer, primary_key=True, index=True, autoincrement= True)
+    username = Column(String, index=True)
+    ime = Column(String, nullable=False)
+    prezime = Column(String, nullable=False)
+    datum_rodjenja = Column(Date, nullable=False)
+    lokacija = Column(String, nullable=False)
+    email = Column(String, unique=True, index=True)
     telefon = Column(String, nullable=True)
-
+    hashed_password = Column(String)
+    disabled = Column(Boolean)
 
 class Vlasnik(Base):
     __tablename__ = "vlasnik_tabela"
@@ -47,7 +49,7 @@ class Teren(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     vlasnik_id = Column(Integer, ForeignKey("vlasnik_tabela.id"), nullable=False)
     sport_id = Column(Integer, ForeignKey("sport_tabela.id"), nullable=False)
-    ocjene_id = Column(Integer, ForeignKey("ocjene_tabela.id"), nullable=False)
+    #ocjene_id = Column(Integer, ForeignKey("ocjene_tabela.id"), nullable=False)
     vrsta = Column(String, nullable=False)
     lokacija = Column(String, nullable=False)
     cijena = Column(Integer, nullable=False)
@@ -110,5 +112,4 @@ class KorisnikTim(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     korisnik_id = Column(Integer, ForeignKey("korisnik_tabela.id"), nullable=False)
     tim_id = Column(Integer, ForeignKey("tim_tabela.id"), nullable=False)
-
 

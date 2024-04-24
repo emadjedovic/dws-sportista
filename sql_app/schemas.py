@@ -1,18 +1,63 @@
 from typing import Optional
 from pydantic import BaseModel, EmailStr, Field, constr, validator
-from datetime import datetime
+from datetime import date, datetime
 
-#Bazne klase
+"""
+1Bazne klase1 sadrze sve podatke
+Nasljedju BaseModel
+"""
+
+class Korisnik(BaseModel):
+    username: str
+    email:str | None = None
+    ime: str | None = None
+    disabled: bool | None = None
+
+class KorisnikInDB(Korisnik):
+    hashed_password: str
+
 
 class KorisnikBase(BaseModel):
+    email: str
 
-    sifra: str
+
+class KorisnikCreate(KorisnikBase):
+    password: str
+
+
+class Korisnik(KorisnikBase):
+    id: int
+    is_active: bool
+
+    class Config:
+        orm_mode = True
+
+
+class KorisnikBase(BaseModel):
+    username: str
+    email: str
+    ime: str
+
+class KorisnikCreate(KorisnikBase):
+    password: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    username: str = None
+
+
+class KorisnikCreate(BaseModel):
+    username: str
+    email: str
     ime: str
     prezime: str
-    datum_rodjenja: datetime
+    datum_rodjenja: date
     lokacija: str
-    mail: EmailStr
-    telefon:str
+    password: str
+
 
 class VlasnikBase(BaseModel):
 
@@ -153,8 +198,8 @@ class KorisnikTimRead(KorisnikTimBase):
 
 #Klase za kreiranje podataka, nasljeduju bazne klase
 
-class KorisnikCreate(KorisnikBase):
-    pass 
+# class KorisnikCreate(KorisnikBase):
+#     pass 
 
 class VlasnikCreate(VlasnikBase):
     pass
