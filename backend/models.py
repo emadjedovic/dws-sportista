@@ -18,6 +18,11 @@ class Korisnik(Base):
     hashed_password = Column(String)
     disabled = Column(Boolean)
 
+    # veze iz drugih tabela
+    sportovi = relationship("KorisnikSport", back_populates="korisnik")
+    timovi = relationship("KorisnikTim", back_populates="korisnik")
+    ocjene = relationship("Ocjene", back_populates="korisnik")
+
 class Vlasnik(Base):
     __tablename__ = "vlasnik_tabela"
 
@@ -30,7 +35,7 @@ class Vlasnik(Base):
     mail = Column(String, unique = True, index=True)
     telefon = Column(String, nullable=True)
 
-    # one to many
+    # veze iz drugih tabela
     tereni = relationship("Teren", back_populates="vlasnik")
 
 class Sport(Base):
@@ -40,8 +45,23 @@ class Sport(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     naziv = Column(String, nullable=False)
 
-    # one to many
+    # veze iz drugih tabela
     tereni = relationship("Teren", back_populates="sport")
+    korisnici = relationship("KorisnikSport", back_populates="sport")
+    timovi = relationship("Tim", back_populates="sport")
+
+# many to many
+class KorisnikSport(Base):
+
+    __tablename__ = "korisnikSport_tabela"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    korisnik_id = vlasnik_id = Column(Integer, ForeignKey("korisnik_tabela.id"), nullable=False)
+    sport_id = Column(Integer, ForeignKey("sport_tabela.id"), nullable=False)
+
+    # veze iz ove tabele
+    korisnik = relationship("Korisnik", back_populates="sportovi")
+    sport = relationship("Sport", back_populates="korisnici")
 
 class Teren(Base):
     __tablename__ = "teren_tabela"
@@ -49,18 +69,16 @@ class Teren(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     vlasnik_id = Column(Integer, ForeignKey("vlasnik_tabela.id"), nullable=False)
     sport_id = Column(Integer, ForeignKey("sport_tabela.id"), nullable=False)
-    #ocjene_id = Column(Integer, ForeignKey("ocjene_tabela.id"), nullable=False)
     vrsta = Column(String, nullable=False)
     lokacija = Column(String, nullable=False)
     cijena = Column(Integer, nullable=False)
 
-    # one to many
+    # veze iz ove tabele
     vlasnik = relationship("Vlasnik", back_populates="tereni")
-    # one to many
     sport = relationship("Sport", back_populates="tereni")
-    # one to one
+
+    # veze iz drugih tabela
     ocjene = relationship("Ocjene", back_populates="teren")
-    # one to many
     termini = relationship("Termin", back_populates="teren")
 
 class Ocjene(Base):
@@ -71,7 +89,8 @@ class Ocjene(Base):
     teren_id = Column(Integer, ForeignKey("teren_tabela.id"), nullable=False)
     ocjena = Column(Integer, nullable=False)
 
-    # one to one
+    # veze iz ove tabele
+    korisnik = relationship("Korisnik", back_populates="ocjene")
     teren = relationship("Teren", back_populates="ocjene")
 
 class Termin(Base):
@@ -84,9 +103,8 @@ class Termin(Base):
     vrijeme_kraja = Column(DateTime, nullable=False)
     je_li_privatni = Column(Boolean, nullable=False)
 
-    # one to many
+    # veze iz ove tabele
     teren = relationship("Teren", back_populates="termini")
-    # one to many
     tim = relationship("Tim", back_populates="termini")
 
 class Tim(Base):
@@ -100,8 +118,12 @@ class Tim(Base):
     lokacija_tima = Column(String, nullable=False)
     broj_slobodnih_mjesta = Column(Integer) # dinamicki se mijenja?
 
-    # one to many
+    # veze iz ove tabele
+    sport = relationship("Sport", back_populates="timovi")
+
+    # veze iz drugih tabela
     termini = relationship("Termin", back_populates="tim")
+    korisnici = relationship("KorisnikTim", back_populates="tim")
 
 # Tabela kreirana zbog many-to-many veze izmedju korisnika i tima
 # jedan korisnik moze biti u vise timova
@@ -112,4 +134,8 @@ class KorisnikTim(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     korisnik_id = Column(Integer, ForeignKey("korisnik_tabela.id"), nullable=False)
     tim_id = Column(Integer, ForeignKey("tim_tabela.id"), nullable=False)
+
+    # veze
+    korisnik = relationship("Korisnik", back_populates="timovi")
+    tim = relationship("Tim", back_populates="korisnici")
 
