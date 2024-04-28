@@ -1,5 +1,4 @@
-
-.container {
+.form, .container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -58,14 +57,14 @@
     padding-left: 1rem;
 }
 
-.forgot-password {
+.account-check {
     margin-top: 20px;
     text-align: center;
     font-size: 0.9rem;
     color: #797979;
 }
 
-.forgot-password span {
+.account-check span {
     color: #1316e9;
     cursor: pointer;
 }
@@ -113,20 +112,10 @@
     margin-bottom: 8px;
   }
 
-  input[type="date"]::-webkit-calendar-picker-indicator {
-    display: none;
-}
-
-  input::-webkit-datetime-edit-fields-wrapper {
-    position: relative;
-    left: 1%;
-}
-input::-webkit-datetime-edit {
-    position: relative;
-    left: 1%;
-}
-  
-  
+  .poslovni-switch {
+    text-align: end;
+    color: #383636;
+  }
 
 @media screen and (max-width: 600px) {
     body{

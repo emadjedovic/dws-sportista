@@ -6,12 +6,28 @@ from sqlalchemy.orm import Session
 import bcrypt
 from datetime import datetime, timedelta
 from jose import jwt, JWTError
+from starlette.middleware.cors import CORSMiddleware
 
 from .database import SessionLocal, engine
 from . import models
 from . import schemas
 
-app = FastAPI()
+def start_application():
+    app = FastAPI()
+    origins = ["*"]
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    return app
+
+
+app = start_application()
 
 # Secret key i algoritam za JWT token
 SECRET_KEY = "neki-tajni-kljuc"
