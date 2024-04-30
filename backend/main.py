@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, List
 
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -149,3 +149,69 @@ async def login(
         )
     access_token = create_access_token(data={"sub": user.username})
     return {"access_token": access_token, "token_type": "bearer"}
+
+# GET
+
+@app.get("/korisnici", response_model=List[schemas.KorisnikRead])
+def get_korisnici_list(db: Session = Depends(get_db)):
+    korisnici_list = db.query(models.Korisnik).all()
+
+    if korisnici_list:
+        for korisnik in korisnici_list:
+            print(korisnik)
+        return korisnici_list
+    else:
+        raise HTTPException(status_code=404, detail="Not found")
+    
+@app.get("/korisnik/{id}")
+def get_korisnik_by_id(id: int, db: Session = Depends(get_db)):
+
+    korisnik = db.query(models.Korisnik).filter(models.Korisnik.id == id).first()
+    if not korisnik:
+        raise HTTPException(status_code=404, detail="Not found")
+
+    return korisnik
+    
+@app.get("/vlasnici", response_model=List[schemas.VlasnikRead])
+def get_vlasnici_list(db: Session = Depends(get_db)):
+    vlasnici_list = db.query(models.Vlasnik).all()
+
+    if vlasnici_list:
+        for vlasnik in vlasnici_list:
+            print(vlasnik)
+        return vlasnici_list
+    else:
+        raise HTTPException(status_code=404, detail="Not found")
+
+@app.get("/tereni", response_model=List[schemas.TerenRead])
+def get_tereni_list(db: Session = Depends(get_db)):
+    tereni_list = db.query(models.Teren).all()
+
+    if tereni_list:
+        for teren in tereni_list:
+            print(teren)
+        return tereni_list
+    else:
+        raise HTTPException(status_code=404, detail="Not found")
+    
+@app.get("/termini", response_model=List[schemas.TerminRead])
+def get_termini_list(db: Session = Depends(get_db)):
+    termini_list = db.query(models.Termin).all()
+
+    if termini_list:
+        for termin in termini_list:
+            print(termin)
+        return termini_list
+    else:
+        raise HTTPException(status_code=404, detail="Not found")
+    
+@app.get("/timovi", response_model=List[schemas.TimRead])
+def get_timovi_list(db: Session = Depends(get_db)):
+    timovi_list = db.query(models.Tim).all()
+
+    if timovi_list:
+        for tim in timovi_list:
+            print(tim)
+        return timovi_list
+    else:
+        raise HTTPException(status_code=404, detail="Not found")
