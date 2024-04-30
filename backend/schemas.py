@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 from pydantic import BaseModel, EmailStr, Field, constr, validator
 from datetime import date, datetime
 
@@ -23,6 +23,7 @@ class KorisnikBase(BaseModel):
 
 class KorisnikCreate(KorisnikBase):
     password: str
+    sportovi: List[int]
 
 
 class Korisnik(KorisnikBase):
@@ -57,6 +58,7 @@ class KorisnikCreate(BaseModel):
     datum_rodjenja: date
     lokacija: str
     password: str
+    sportovi: list[int]
 
 
 class VlasnikBase(BaseModel):
