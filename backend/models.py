@@ -5,10 +5,10 @@ from database import Base
 
 
 class Korisnik(Base):
-    __tablename__ = "korisnik_tabela"
+    __tablename__ = "korisnik"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    username = Column(String, index=True)
+    username = Column(String, index=True, nullable=False)
     ime = Column(String, nullable=False)
     prezime = Column(String, nullable=False)
     datum_rodjenja = Column(Date, nullable=False)
@@ -25,7 +25,7 @@ class Korisnik(Base):
 
 
 class Vlasnik(Base):
-    __tablename__ = "vlasnik_tabela"
+    __tablename__ = "vlasnik"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     sifra = Column(String, nullable=False)
@@ -42,10 +42,10 @@ class Vlasnik(Base):
 
 class Sport(Base):
 
-    __tablename__ = "sport_tabela"
+    __tablename__ = "sport"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    naziv = Column(String, nullable=False)
+    naziv = Column(String, index=True, nullable=False)
 
     # veze iz drugih tabela
     tereni = relationship("Teren", back_populates="sport")
@@ -56,13 +56,13 @@ class Sport(Base):
 # many to many
 class KorisnikSport(Base):
 
-    __tablename__ = "korisnikSport_tabela"
+    __tablename__ = "korisnikSport"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     korisnik_id = vlasnik_id = Column(
-        Integer, ForeignKey("korisnik_tabela.id"), nullable=False
+        Integer, ForeignKey("korisnik.id"), nullable=False
     )
-    sport_id = Column(Integer, ForeignKey("sport_tabela.id"), nullable=False)
+    sport_id = Column(Integer, ForeignKey("sport.id"), nullable=False)
 
     # veze iz ove tabele
     korisnik = relationship("Korisnik", back_populates="sportovi")
@@ -70,11 +70,11 @@ class KorisnikSport(Base):
 
 
 class Teren(Base):
-    __tablename__ = "teren_tabela"
+    __tablename__ = "teren"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    vlasnik_id = Column(Integer, ForeignKey("vlasnik_tabela.id"), nullable=False)
-    sport_id = Column(Integer, ForeignKey("sport_tabela.id"), nullable=False)
+    vlasnik_id = Column(Integer, ForeignKey("vlasnik.id"), nullable=False)
+    sport_id = Column(Integer, ForeignKey("sport.id"), nullable=False)
     vrsta = Column(String, nullable=False)
     lokacija = Column(String, nullable=False)
     cijena = Column(Integer, nullable=False)
@@ -89,12 +89,13 @@ class Teren(Base):
 
 
 class Ocjene(Base):
-    __tablename__ = "ocjene_tabela"
+    __tablename__ = "ocjene"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    korisnik_id = Column(Integer, ForeignKey("korisnik_tabela.id"), nullable=False)
-    teren_id = Column(Integer, ForeignKey("teren_tabela.id"), nullable=False)
+    korisnik_id = Column(Integer, ForeignKey("korisnik.id"), nullable=False)
+    teren_id = Column(Integer, ForeignKey("teren.id"), nullable=False)
     ocjena = Column(Integer, nullable=False)
+    # komentari i vremenske oznake?
 
     # veze iz ove tabele
     korisnik = relationship("Korisnik", back_populates="ocjene")
@@ -102,14 +103,22 @@ class Ocjene(Base):
 
 
 class Termin(Base):
-    __tablename__ = "termin_tabela"
+    __tablename__ = "termin"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    teren_id = Column(Integer, ForeignKey("teren_tabela.id"), nullable=False)
-    tim_id = Column(Integer, ForeignKey("tim_tabela.id"), nullable=False)
+    teren_id = Column(Integer, ForeignKey("teren.id"), nullable=False)
+    tim_id = Column(Integer, ForeignKey("tim.id"), nullable=False)
     vrijeme_pocetka = Column(DateTime, nullable=False)
     vrijeme_kraja = Column(DateTime, nullable=False)
     je_li_privatni = Column(Boolean, nullable=False)
+    broj_slobodnih_mjesta = Column(Integer)
+    potreban_broj_igraca = Column(Integer)
+    max_broj_igraca = Column(Integer, nullable=False)
+    nivo_vjestine = Column(
+        Integer, nullable=False
+    )  # Koliki nivo vjestine korisnici moraju imati da bi mogli pristupiti terminu
+    
+    lokacija_tima = Column(String, nullable=False)
 
     # veze iz ove tabele
     teren = relationship("Teren", back_populates="termini")
@@ -117,17 +126,10 @@ class Termin(Base):
 
 
 class Tim(Base):
-    __tablename__ = "tim_tabela"
+    __tablename__ = "tim"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    sport_id = Column(Integer, ForeignKey("sport_tabela.id"), nullable=False)
-    potreban_broj_igraca = Column(Integer)  # dinamicki se mijenja?
-    max_broj_igraca = Column(Integer, nullable=False)
-    nivo_vjestine = Column(
-        Integer, nullable=False
-    )  # Koliki nivo vjestine korisnici moraju imati da bi mogli biti u timu
-    lokacija_tima = Column(String, nullable=False)
-    broj_slobodnih_mjesta = Column(Integer)  # dinamicki se mijenja?
+    sport_id = Column(Integer, ForeignKey("sport.id"), nullable=False)
 
     # veze iz ove tabele
     sport = relationship("Sport", back_populates="timovi")
@@ -141,11 +143,11 @@ class Tim(Base):
 # jedan korisnik moze biti u vise timova
 class KorisnikTim(Base):
 
-    __tablename__ = "korisnik_tim_tabela"
+    __tablename__ = "korisnik_tim"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    korisnik_id = Column(Integer, ForeignKey("korisnik_tabela.id"), nullable=False)
-    tim_id = Column(Integer, ForeignKey("tim_tabela.id"), nullable=False)
+    korisnik_id = Column(Integer, ForeignKey("korisnik.id"), nullable=False)
+    tim_id = Column(Integer, ForeignKey("tim.id"), nullable=False)
 
     # veze
     korisnik = relationship("Korisnik", back_populates="timovi")
