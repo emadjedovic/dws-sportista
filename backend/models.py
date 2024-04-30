@@ -1,7 +1,7 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Date, DateTime
 from sqlalchemy.orm import relationship
 
-from database import Base
+from .database import Base
 
 
 class Korisnik(Base):
@@ -33,7 +33,7 @@ class Vlasnik(Base):
     prezime = Column(String, nullable=False)
     datum_rodjenja = Column(Date, nullable=False)
     lokacija = Column(String, nullable=False)
-    email = Column(String, index=True, unique=True, index=True)
+    email = Column(String, index=True, unique=True )#, index=True Pravi bug
     telefon = Column(String, nullable=True)
 
     # veze iz drugih tabela
