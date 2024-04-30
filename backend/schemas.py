@@ -35,7 +35,7 @@ class Korisnik(KorisnikBase):
 
 class KorisnikBase(BaseModel):
     username: str
-    email: str
+    email: EmailStr
     ime: str
 
 class KorisnikCreate(KorisnikBase):
