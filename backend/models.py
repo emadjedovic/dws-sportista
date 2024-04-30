@@ -8,7 +8,7 @@ class Korisnik(Base):
     __tablename__ = "korisnik"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    username = Column(String, index=True, nullable=False)
+    username = Column(String, index=True, unique=True, nullable=False)
     ime = Column(String, nullable=False)
     prezime = Column(String, nullable=False)
     datum_rodjenja = Column(Date, nullable=False)
@@ -33,7 +33,7 @@ class Vlasnik(Base):
     prezime = Column(String, nullable=False)
     datum_rodjenja = Column(Date, nullable=False)
     lokacija = Column(String, nullable=False)
-    mail = Column(String, unique=True, index=True)
+    email = Column(String, index=True, unique=True, index=True)
     telefon = Column(String, nullable=True)
 
     # veze iz drugih tabela

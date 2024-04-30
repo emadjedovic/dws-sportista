@@ -1,4 +1,5 @@
 from typing import Annotated, List
+from pydantic import EmailStr
 
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -150,7 +151,7 @@ async def login(
     access_token = create_access_token(data={"sub": user.username})
     return {"access_token": access_token, "token_type": "bearer"}
 
-# GET
+# OSNOVNE GET PUTANJE
 
 @app.get("/korisnici", response_model=List[schemas.KorisnikRead])
 def get_korisnici_list(db: Session = Depends(get_db)):
@@ -171,6 +172,16 @@ def get_korisnik_by_id(id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Not found")
 
     return korisnik
+
+@app.get("/korisnik/{username}")
+def get_korisnik_by_username(u: str, db: Session = Depends(get_db)):
+
+    korisnik = db.query(models.Korisnik).filter(models.Korisnik.username == u).first()
+    if not korisnik:
+        raise HTTPException(status_code=404, detail="Not found")
+
+    return korisnik
+
     
 @app.get("/vlasnici", response_model=List[schemas.VlasnikRead])
 def get_vlasnici_list(db: Session = Depends(get_db)):
@@ -215,3 +226,30 @@ def get_timovi_list(db: Session = Depends(get_db)):
         return timovi_list
     else:
         raise HTTPException(status_code=404, detail="Not found")
+    
+    
+# POMOCNE FUNKCIJE
+
+def get_korisnici_email(e: EmailStr, db: Session = Depends(get_db)):
+
+    korisnik = db.query(models.Korisnik).filter(models.Korisnik.id == e).first()
+    if not korisnik:
+        raise HTTPException(status_code=404, detail="Not found")
+
+    return korisnik
+
+def get_korisnici_ime(i: str, db: Session = Depends(get_db)):
+
+    korisnici_lista = db.query(models.Korisnik).filter(models.Korisnik.ime == i)
+    if not korisnici_lista:
+        raise HTTPException(status_code=404, detail="Not found")
+
+    return korisnici_lista
+
+def get_korisnici_prezime(p: str, db: Session = Depends(get_db)):
+
+    korisnici_lista = db.query(models.Korisnik).filter(models.Korisnik.prezime == p)
+    if not korisnici_lista:
+        raise HTTPException(status_code=404, detail="Not found")
+
+    return korisnici_lista
