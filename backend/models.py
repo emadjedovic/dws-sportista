@@ -33,7 +33,9 @@ class Vlasnik(Base):
     prezime = Column(String, nullable=False)
     datum_rodjenja = Column(Date, nullable=False)
     lokacija = Column(String, nullable=False)
-    email = Column(String, index=True, unique=True )#, index=True Pravi bug
+    email = Column(
+        String, unique=True
+    )  # , index=True Pravi bug # pokusat cemo bez indexa
     telefon = Column(String, nullable=True)
 
     # veze iz drugih tabela
@@ -114,10 +116,7 @@ class Termin(Base):
     broj_slobodnih_mjesta = Column(Integer)
     potreban_broj_igraca = Column(Integer)
     max_broj_igraca = Column(Integer, nullable=False)
-    nivo_vjestine = Column(
-        Integer, nullable=False
-    )  # Koliki nivo vjestine korisnici moraju imati da bi mogli pristupiti terminu
-    
+    nivo_vjestine = Column(Integer, nullable=False)
     lokacija_tima = Column(String, nullable=False)
 
     # veze iz ove tabele
