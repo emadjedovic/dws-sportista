@@ -9,9 +9,11 @@ class KorisnikBase(BaseModel):
     username: str | None = None
     email: EmailStr | None = None
     ime: str | None = None
+    prezime: str | None = None
     disabled: bool | None = None
     datum_rodjenja: date | None = None
     lokacija: str | None = None
+    telefon: str | None = None
 
 
 class KorisnikInDB(KorisnikBase):
@@ -36,13 +38,26 @@ class TokenData(BaseModel):
 
 
 class VlasnikBase(BaseModel):
-    sifra: str | None = None
+    
     ime: str | None = None
+    username: str | None = None
     prezime: str | None = None
     datum_rodjenja: datetime | None = None
     lokacija: str | None = None
-    mail: EmailStr | None = None
+    email: EmailStr | None = None
     telefon: str | None = None
+
+
+class VlasnikInDB(VlasnikBase):
+    sifra: str
+
+
+class Vlasnik(VlasnikBase):
+    id: int
+    is_active: bool
+
+    class Config:
+        from_attributes = True
 
 
 class SportBase(BaseModel):
@@ -174,7 +189,7 @@ class KorisnikCreate(KorisnikBase):
 
 
 class VlasnikCreate(VlasnikBase):
-    pass
+    sifra:str
 
 
 class SportCreate(SportBase):

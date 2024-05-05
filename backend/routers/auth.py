@@ -1,16 +1,15 @@
 from datetime import datetime, timedelta
 import bcrypt
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, APIRouter
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from requests import Session
-from jose import jwt, JWTError
+from sqlalchemy.orm import Session
+from typing import Union
+from jose import JWTError, jwt
 
 from backend import models, schemas
 from ..dependencies import get_db
 
-
 router = APIRouter()
-
 
 # Secret key i algoritam za JWT token
 SECRET_KEY = "neki-tajni-kljuc"
@@ -21,7 +20,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
-##Funkcija za kreiranje JWT pristupnog tokena
+#Funkcija za kreiranje JWT pristupnog tokena
 def create_access_token(data: dict):
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -44,12 +43,24 @@ async def read_items(token: str = Depends(oauth2_scheme)):
     return {"token": token}
 
 
-@router.post("/register", response_model=schemas.Korisnik)
-def register_user(user_data: schemas.KorisnikCreate, db: Session = Depends(get_db)):
+# Registracija korisnika ili vlasnika
+@router.post("/register", response_model=Union[schemas.Korisnik, schemas.Vlasnik])
+def register_user_or_owner(
+    user_data: Union[schemas.KorisnikCreate, schemas.VlasnikCreate],
+    db: Session = Depends(get_db)
+):
+    if isinstance(user_data, schemas.KorisnikCreate):
+         return register_korisnik(user_data, db)
+    elif isinstance(user_data, schemas.VlasnikCreate):
+        return register_vlasnik(user_data, db)
+
+
+# Funkcija za registraciju korisnika
+def register_korisnik(korisnik_data: schemas.KorisnikCreate, db: Session):
     # Provjera da li je username zauzet
     existing_user = (
         db.query(models.Korisnik)
-        .filter(models.Korisnik.username == user_data.username)
+        .filter(models.Korisnik.username == korisnik_data.username)
         .first()
     )
     if existing_user:
@@ -61,7 +72,7 @@ def register_user(user_data: schemas.KorisnikCreate, db: Session = Depends(get_d
     # Provjera da li je email vec registrovan
     existing_email = (
         db.query(models.Korisnik)
-        .filter(models.Korisnik.email == user_data.email)
+        .filter(models.Korisnik.email == korisnik_data.email)
         .first()
     )
     if existing_email:
@@ -71,56 +82,122 @@ def register_user(user_data: schemas.KorisnikCreate, db: Session = Depends(get_d
 
     # Hash-ovanje sifre
     hashed_password = bcrypt.hashpw(
-        user_data.password.encode("utf-8"), bcrypt.gensalt()
+        korisnik_data.password.encode("utf-8"), bcrypt.gensalt()
     ).decode("utf-8")
 
     # Kreiranje novog korisnika
-    new_user = models.Korisnik(
-        username=user_data.username,
-        email=user_data.email,
-        ime=user_data.ime,
-        prezime=user_data.prezime,
-        datum_rodjenja=user_data.datum_rodjenja,
-        lokacija=user_data.lokacija,
+    novi_korisnik = models.Korisnik(
+        username=korisnik_data.username,
+        email=korisnik_data.email,
+        ime=korisnik_data.ime,
+        prezime=korisnik_data.prezime,
+        datum_rodjenja=korisnik_data.datum_rodjenja,
+        lokacija=korisnik_data.lokacija,
         hashed_password=hashed_password,
+        telefon = korisnik_data.telefon,
         disabled=False,
     )
 
-    # Dodavanje sportova korisnika
-    for sport in user_data.sportovi:
-        new_user.sportovi.append(models.KorisnikSport(sport_id=sport))
+    #Dodavanje sportova korisnika
+    for sport in korisnik_data.sportovi:
+        novi_korisnik.sportovi.append(models.KorisnikSport(sport_id=sport))
 
-    # Dodavanje korisnika u bazu
-    db.add(new_user)
+    #Dodavanje korisnika u bazu
+    db.add(novi_korisnik)
     db.commit()
-    db.refresh(new_user)
+    db.refresh(novi_korisnik)
 
-    access_token = create_access_token(data={"sub": new_user.username})
+    access_token = create_access_token(data={"sub": novi_korisnik.username})
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "email": new_user.email,
-        "id": new_user.id,
-        "is_active": not new_user.disabled,
+        "email": novi_korisnik.email,
+        "id": novi_korisnik.id,
+        "is_active": not novi_korisnik.disabled,
     }
 
 
-# Login endpoint
+# Funkcija za registraciju vlasnika
+def register_vlasnik(vlasnik_data: schemas.VlasnikCreate, db: Session):
+    #Provjera da li je username zauzet
+    existing_user = (
+        db.query(models.Vlasnik)
+        .filter(models.Vlasnik.username == vlasnik_data.username)
+        .first()
+    )
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Username already registered",
+        )
+
+    # Provjera da li je email vec registrovan
+    existing_email = (
+        db.query(models.Vlasnik)
+        .filter(models.Vlasnik.email == vlasnik_data.email)
+        .first()
+    )
+    if existing_email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered"
+        )
+
+    # Hash-ovanje sifre
+    hashed_password = bcrypt.hashpw(
+        vlasnik_data.sifra.encode("utf-8"), bcrypt.gensalt()
+    ).decode("utf-8")
+
+    # Kreiranje novog vlasnika
+    novi_vlasnik = models.Vlasnik(
+        sifra=hashed_password,
+        username = vlasnik_data.username,
+        ime=vlasnik_data.ime,
+        prezime=vlasnik_data.prezime,
+        datum_rodjenja=vlasnik_data.datum_rodjenja,
+        lokacija=vlasnik_data.lokacija,
+        email=vlasnik_data.email,
+        telefon=vlasnik_data.telefon,
+    )
+
+    # Dodavanje vlasnika u bazu
+    db.add(novi_vlasnik)
+    db.commit()
+    db.refresh(novi_vlasnik)
+
+    access_token = create_access_token(data={"sub": novi_vlasnik.username})
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "email": novi_vlasnik.email,
+        "id": novi_vlasnik.id,
+        "is_active": True,  
+    }
+
+
 @router.post("/token", response_model=schemas.Token)
-async def login(
-    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
-):
+async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    # Provjera da li je korisnik
     user = (
         db.query(models.Korisnik)
         .filter(models.Korisnik.username == form_data.username)
         .first()
     )
-    if not user or not bcrypt.checkpw(
-        form_data.password.encode("utf-8"), user.hashed_password.encode("utf-8")
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Incorrect username or password",
-        )
-    access_token = create_access_token(data={"sub": user.username})
-    return {"access_token": access_token, "token_type": "bearer"}
+    if user and bcrypt.checkpw(form_data.password.encode("utf-8"), user.hashed_password.encode("utf-8")):
+        access_token = create_access_token(data={"sub": user.username})
+        return {"access_token": access_token, "token_type": "bearer"}
+
+    # Provjera da li je vlasnik
+    vlasnik = (
+        db.query(models.Vlasnik)
+        .filter(models.Vlasnik.username == form_data.username)
+        .first()
+    )
+    if vlasnik and bcrypt.checkpw(form_data.password.encode("utf-8"), vlasnik.sifra.encode("utf-8")):
+        access_token = create_access_token(data={"sub": vlasnik.username})
+        return {"access_token": access_token, "token_type": "bearer"}
+
+    # Ako nije korisnik niti vlasnik 
+    raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="Incorrect username or password",
+    )
