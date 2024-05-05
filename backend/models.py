@@ -28,6 +28,8 @@ class Vlasnik(Base):
     __tablename__ = "vlasnik"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+    username = Column(String, index=True, unique=True, nullable=False)
+
     sifra = Column(String, nullable=False)
     ime = Column(String, nullable=False)
     prezime = Column(String, nullable=False)
