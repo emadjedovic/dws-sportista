@@ -6,7 +6,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 180vh;
-  background-image: url('./Components/Assests/OIP.jpg'); 
+  background-image: url('./Assets/OIP.jpg'); 
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center; 

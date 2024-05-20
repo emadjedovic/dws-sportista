@@ -4,6 +4,7 @@ import logo from './logo.svg';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import Footer from './Components/Footer/Footer';
 import Header from './Components/Header/Header';
+import Home from './Components/Home/Home';
 import KorisnikList from "./Components/KorisnikList/KorisnikList";
 import LoginSignup from './Components/LoginSignup/LoginSignup';
 import Profil from './Components/Profil/Profil';
@@ -15,10 +16,11 @@ import './App.css';
 
 
 /*
-Uslovno renderujemo Header komponent shodno tome je li LoginSignup komponenta aktivna. Koristi se hook useLocation
-da odredimo trenutnu putanju i pokažemo Header samo kad nismo na putanju "/", što je LoginSignup.
-Kreiramo novu komponentu Main koja koristi taj useLocation hook.
-Ovime se osiguravamo da nemamo Header komponentu na početnoj stranici gdje se korisnik prijavljuje/registruje.
+Uslovno renderujemo Header i Footer komponente shodno tome je li LoginSignup komponenta aktivna.
+Koristi se hook useLocation da odredimo trenutnu putanju i pokažemo Header samo kad nismo na
+putanji "/", što je LoginSignup. Kreiramo novu komponentu Main koja koristi taj useLocation hook.
+Ovime se osiguravamo da nemamo Header i Footer komponente na početnoj stranici
+gdje se korisnik prijavljuje/registruje.
 */
 
 function App() {
@@ -38,9 +40,15 @@ function Main() {
       {!isLoginSignupPage && <Header />}
       <Routes>
         <Route path="/" element={<LoginSignup />} />
-        {/* dodati ostale rute */}
+        <Route path="/home" element={<Home />} />
+        <Route path="/korisnici" element={<KorisnikList />} />
+        <Route path="/vlasnici" element={<VlasnikList />} />
+        <Route path="/tereni" element={<TereniList />} />
+        <Route path="/termini" element={<TerminiList />} />
+        <Route path="/timovi" element={<TimoviList />} />
+        <Route path="/profil" element={<Profil />} />
       </Routes>
-      <Footer />
+      {!isLoginSignupPage && <Footer />}
     </div>
     );
 }
