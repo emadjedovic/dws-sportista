@@ -2,15 +2,15 @@ import React, {useState, useEffect} from "react";
 import api from './api';
 import logo from './logo.svg';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
-import Footer from './Components/Footer';
-import Header from './Components/Header';
-import KorisnikList from "./Components/KorisnikList";
-import LoginSignup from './Components/LoginSignup';
-import Profil from './Components/Profil';
-import TereniList from './Components/TereniList';
-import TerminiList from './Components/TerminiList';
-import TimoviList from './Components/TimoviList';
-import VlasnikList from './Components/VlasnikList';
+import Footer from './Components/Footer/Footer';
+import Header from './Components/Header/Header';
+import KorisnikList from "./Components/KorisnikList/KorisnikList";
+import LoginSignup from './Components/LoginSignup/LoginSignup';
+import Profil from './Components/Profil/Profil';
+import TereniList from './Components/TereniList/TereniList';
+import TerminiList from './Components/TerminiList/TerminiList';
+import TimoviList from './Components/TimoviList/TimoviList';
+import VlasnikList from './Components/VlasnikList/VlasnikList';
 import './App.css';
 
 
