@@ -1,14 +1,16 @@
-import React, {useState, useEffect} from "react"
-import api from './api'
+import React, {useState, useEffect} from "react";
+import api from './api';
 import logo from './logo.svg';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
-import LoginSignup from './Components/LoginSignup';
-import Profile from './Components/Profile';
-import Search from './Components/Search';
-import CreateEvent from './Components/CreateEvent';
-import EventDetails from './Components/EventDetails';
-import Header from './Components/Header';
 import Footer from './Components/Footer';
+import Header from './Components/Header';
+import KorisnikList from "./Components/KorisnikList";
+import LoginSignup from './Components/LoginSignup';
+import Profil from './Components/Profil';
+import TereniList from './Components/TereniList';
+import TerminiList from './Components/TerminiList';
+import TimoviList from './Components/TimoviList';
+import VlasnikList from './Components/VlasnikList';
 import './App.css';
 
 
@@ -36,10 +38,6 @@ function Main() {
       {!isLoginSignupPage && <Header />}
       <Routes>
         <Route path="/" element={<LoginSignup />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/search" element={<Search />} />
-        <Route path="/create-event" element={<CreateEvent />} />
-        <Route path="/event-details" element={<EventDetails />} />
       </Routes>
       <Footer />
     </div>

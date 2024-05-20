@@ -3,13 +3,16 @@ import React from 'react';
 function Header() {
   return (
     <header>
-      <h1>Header</h1>
+      {/* Navigacijska traka */}
       <nav>
         <a href="/">Home</a>
+        <a href="/korisnici">Korisnici</a>
+        <a href="/vlasnici">Vlasnici</a>
+        <a href="/tereni">Tereni</a>
+        <a href="/termini">Termini</a>
+        <a href="/timovi">Timovi</a>
+        <a href="/profil">Vaš profil</a>
         <a href="/login-signup">Login/Signup</a>
-        <a href="/profile">Profile</a>
-        <a href="/search">Search</a>
-        <a href="/create-event">Create Event</a>
       </nav>
     </header>
   );
