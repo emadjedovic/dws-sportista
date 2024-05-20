@@ -1,9 +1,9 @@
 from fastapi import FastAPI, Depends
 from starlette.middleware.cors import CORSMiddleware
-from .routers import auth, korisnik, vlasnik, sport
+from routers import auth, korisnik, vlasnik, sport
 
-from .database import  engine
-from . import models
+from database import  engine
+import models
 
 
 def start_application():
