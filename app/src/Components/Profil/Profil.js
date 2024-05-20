@@ -1,4 +1,5 @@
 import React from 'react';
+import './Profil.css';
 
 // komponenta koja prikazuje sve informacije o profilu na kojem smo ulogovani
 

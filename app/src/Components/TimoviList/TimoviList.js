@@ -1,3 +1,6 @@
+import React from 'react';
+import './TimoviList.css';
+
 // komponenta koja vraća listu svih timova
 // sadrži opciju za pretragu specifičnog tima
 

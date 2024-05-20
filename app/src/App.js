@@ -38,6 +38,7 @@ function Main() {
       {!isLoginSignupPage && <Header />}
       <Routes>
         <Route path="/" element={<LoginSignup />} />
+        {/* dodati ostale rute */}
       </Routes>
       <Footer />
     </div>

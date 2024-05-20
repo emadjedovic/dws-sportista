@@ -1,9 +1,11 @@
 import React from 'react';
+import './Header.css';
+
+// navigacijska traka
 
 function Header() {
   return (
     <header>
-      {/* Navigacijska traka */}
       <nav>
         <a href="/">Home</a>
         <a href="/korisnici">Korisnici</a>

@@ -1,3 +1,6 @@
+import React from 'react';
+import './TereniList.css';
+
 // komponenta koja vraća listu svih terena
 // sadrži opciju za pretragu specifičnog terena
 
