@@ -3,14 +3,12 @@ from typing import List
 from fastapi import Depends, HTTPException, APIRouter
 from requests import Session
 
-from backend import models, schemas
-from backend.dependencies import get_db
+import models, schemas
+from dependencies import get_db
 
 
 router = APIRouter()
 
-
-# OSNOVNE GET PUTANJE
 
 @router.get("/vlasnici", response_model=List[schemas.VlasnikRead])
 def get_vlasnici_list(db: Session = Depends(get_db)):
