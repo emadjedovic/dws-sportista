@@ -3,14 +3,12 @@ from typing import List
 from fastapi import Depends, HTTPException, APIRouter
 from requests import Session
 
-from backend import models, schemas
-from backend.dependencies import get_db
+import models, schemas
+from dependencies import get_db
 
 
 router = APIRouter()
 
-
-# OSNOVNE GET PUTANJE
 
 @router.get("/tereni", response_model=List[schemas.TerenRead])
 def get_tereni_list(db: Session = Depends(get_db)):

@@ -1,9 +1,6 @@
-from typing import List, Optional
-from pydantic import BaseModel, EmailStr, Field, constr, validator
+from typing import List
+from pydantic import BaseModel, EmailStr, Field, validator
 from datetime import date, datetime
-
-# Bazne klase
-
 
 class KorisnikBase(BaseModel):
     username: str | None = None
@@ -20,13 +17,17 @@ class KorisnikInDB(KorisnikBase):
     hashed_password: str
 
 
-class Korisnik(KorisnikBase):
+class KorisnikRead(KorisnikBase):
     id: int
     is_active: bool
 
     class Config:
         from_attributes = True
 
+
+class KorisnikCreate(KorisnikBase):
+    password: str
+    sportovi: List[int]
 
 class Token(BaseModel):
     access_token: str
@@ -48,11 +49,14 @@ class VlasnikBase(BaseModel):
     telefon: str | None = None
 
 
+class VlasnikCreate(VlasnikBase):
+    sifra:str
+
 class VlasnikInDB(VlasnikBase):
     sifra: str
 
 
-class Vlasnik(VlasnikBase):
+class VlasnikRead(VlasnikBase):
     id: int
     is_active: bool
 
@@ -64,6 +68,16 @@ class SportBase(BaseModel):
     naziv: str | None = None
 
 
+class SportRead(SportBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+
+class SportCreate(SportBase):
+    pass
+
 class TerenBase(BaseModel):
     vlasnik_id: int
     sport_id: int
@@ -72,12 +86,31 @@ class TerenBase(BaseModel):
     lokacija: str
     cijena: int
 
+class TerenRead(TerenBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+
+class TerenCreate(TerenBase):
+    pass
 
 class OcjeneBase(BaseModel):
     korisnik_id: int
     teren_id: int
     ocjena: int = Field(..., ge=0, le=5)  # od 0 do 5
 
+    
+class OcjeneRead(OcjeneBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+
+class OcjeneCreate(OcjeneBase):
+    pass
 
 class TerminBase(BaseModel):
     teren_id: int
@@ -92,6 +125,16 @@ class TerminBase(BaseModel):
             raise ValueError("Vrijeme kraja mora biti nakon vremena početka.")
         return v
 
+
+class TerminRead(TerminBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+
+class TerminCreate(TerminBase):
+    pass
 
 class TimBase(BaseModel):
     sport_id: int
@@ -116,101 +159,24 @@ class TimBase(BaseModel):
         return v
 
 
-class KorisnikTimBase(BaseModel):
-    korisnik_id: int
-    tim_id: int
-
-
-# Klase za citanje podataka, nasljeduju bazne
-
-
-class KorisnikRead(KorisnikBase):
-    id: int
-
-    class Config:
-        from_attributes = True
-
-
-class VlasnikRead(VlasnikBase):
-    id: int
-
-    class Config:
-        from_attributes = True
-
-
-class SportRead(SportBase):
-    id: int
-
-    class Config:
-        from_attributes = True
-
-
-class TerenRead(TerenBase):
-    id: int
-
-    class Config:
-        from_attributes = True
-
-
-class OcjeneRead(OcjeneBase):
-    id: int
-
-    class Config:
-        from_attributes = True
-
-
-class TerminRead(TerminBase):
-    id: int
-
-    class Config:
-        from_attributes = True
-
-
 class TimRead(TimBase):
     id: int
 
     class Config:
         from_attributes = True
 
+class TimCreate(TimBase):
+    pass
+
+class KorisnikTimBase(BaseModel):
+    korisnik_id: int
+    tim_id: int
 
 class KorisnikTimRead(KorisnikTimBase):
     id: int
 
     class Config:
         from_attributes = True
-
-
-# Klase za kreiranje podataka, nasljeduju bazne klase
-
-
-class KorisnikCreate(KorisnikBase):
-    password: str
-    sportovi: List[int]
-
-
-class VlasnikCreate(VlasnikBase):
-    sifra:str
-
-
-class SportCreate(SportBase):
-    pass
-
-
-class TerenCreate(TerenBase):
-    pass
-
-
-class OcjeneCreate(OcjeneBase):
-    pass
-
-
-class TerminCreate(TerminBase):
-    pass
-
-
-class TimCreate(TimBase):
-    pass
-
 
 class KorisnikTimCreate(KorisnikTimBase):
     pass

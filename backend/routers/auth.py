@@ -6,8 +6,8 @@ from sqlalchemy.orm import Session
 from typing import Union
 from jose import JWTError, jwt
 
-from backend import models, schemas
-from ..dependencies import get_db
+import models, schemas
+from dependencies import get_db
 
 router = APIRouter()
 
@@ -44,7 +44,7 @@ async def read_items(token: str = Depends(oauth2_scheme)):
 
 
 # Registracija korisnika ili vlasnika
-@router.post("/register", response_model=Union[schemas.Korisnik, schemas.Vlasnik])
+@router.post("/register", response_model=Union[schemas.KorisnikRead, schemas.VlasnikRead])
 def register_user_or_owner(
     user_data: Union[schemas.KorisnikCreate, schemas.VlasnikCreate],
     db: Session = Depends(get_db)

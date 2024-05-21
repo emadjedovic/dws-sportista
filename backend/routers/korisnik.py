@@ -4,14 +4,13 @@ from fastapi import Depends, HTTPException, APIRouter
 from pydantic import EmailStr
 from requests import Session
 
-from backend import models, schemas
-from backend.dependencies import get_db
+import models, schemas
+from dependencies import get_db
 
 
 router = APIRouter()
 
 
-# OSNOVNE GET PUTANJE
 @router.get("/korisnici", response_model=List[schemas.KorisnikRead])
 def get_korisnici_list(db: Session = Depends(get_db)):
     korisnici_list = db.query(models.Korisnik).all()
