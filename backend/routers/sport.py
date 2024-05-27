@@ -9,6 +9,13 @@ from dependencies import get_db
 
 router = APIRouter()
 
+@router.get("/sportovi", response_model=List[schemas.SportRead])
+def get_sportovi_list(db: Session = Depends(get_db)):
+    sportovi_list = db.query(models.Sport).all()
+    if sportovi_list:
+        return sportovi_list
+    else:
+        raise HTTPException(status_code=404, detail="Not found")
 
 @router.get("/tereni", response_model=List[schemas.TerenRead])
 def get_tereni_list(db: Session = Depends(get_db)):
