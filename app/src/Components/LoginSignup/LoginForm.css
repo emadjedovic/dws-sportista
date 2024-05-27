@@ -1,0 +1,52 @@
+.login-container{
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+    padding:auto;
+}
+
+.input{
+    margin: auto auto;
+    width: 60%;
+}
+
+.submit {
+    height: 50px;
+    min-width: 150px; 
+    color: #fff;
+    background-color: #1316e9;
+    border-radius: 25px;
+    padding: 0.1rem 1rem;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.account-check {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #797979;
+}
+
+.account-check .clickable {
+    color: #1316e9;
+    cursor: pointer;
+}
+
+.submit-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 40px auto;
+    
+}
+
+.incorrect-data{
+    color:red;
+    margin: 2% auto;
+}

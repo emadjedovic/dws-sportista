@@ -144,12 +144,12 @@ def register_vlasnik(vlasnik_data: schemas.VlasnikCreate, db: Session):
 
     # Hash-ovanje sifre
     hashed_password = bcrypt.hashpw(
-        vlasnik_data.sifra.encode("utf-8"), bcrypt.gensalt()
+        vlasnik_data.password.encode("utf-8"), bcrypt.gensalt()
     ).decode("utf-8")
 
     # Kreiranje novog vlasnika
     novi_vlasnik = models.Vlasnik(
-        sifra=hashed_password,
+        password=hashed_password,
         username = vlasnik_data.username,
         ime=vlasnik_data.ime,
         prezime=vlasnik_data.prezime,
@@ -192,7 +192,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
         .filter(models.Vlasnik.username == form_data.username)
         .first()
     )
-    if vlasnik and bcrypt.checkpw(form_data.password.encode("utf-8"), vlasnik.sifra.encode("utf-8")):
+    if vlasnik and bcrypt.checkpw(form_data.password.encode("utf-8"), vlasnik.password.encode("utf-8")):
         access_token = create_access_token(data={"sub": vlasnik.username})
         return {"access_token": access_token, "token_type": "bearer"}
 

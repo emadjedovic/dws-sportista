@@ -50,10 +50,10 @@ class VlasnikBase(BaseModel):
 
 
 class VlasnikCreate(VlasnikBase):
-    sifra:str
+    password:str
 
 class VlasnikInDB(VlasnikBase):
-    sifra: str
+    password: str
 
 
 class VlasnikRead(VlasnikBase):
