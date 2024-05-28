@@ -136,6 +136,20 @@ class TerminRead(TerminBase):
 class TerminCreate(TerminBase):
     pass
 
+
+class TerminCreate(BaseModel):
+    teren_id: int
+    tim_id: int
+    vrijeme_pocetka: datetime
+    vrijeme_kraja: datetime
+    je_li_privatni: bool
+    #broj_slobodnih_mjesta: int
+    potreban_broj_igraca: int
+    max_broj_igraca: int
+    nivo_vjestine: int
+    lokacija_tima: str
+
+
 class TimBase(BaseModel):
     sport_id: int
     termin_id: int
@@ -145,9 +159,9 @@ class TimBase(BaseModel):
     max_broj_igraca: int  # max broj igraca na terminu
     nivo_vjestine: int = Field(..., ge=0, le=5)  # od 0 do 5
     lokacija_tima: str
-    broj_slobodnih_mjesta: int = Field(
-        ..., ge=0
-    )  # da li je ovo duplikat, vec ima potreban_broj_igraca?
+    # broj_slobodnih_mjesta: int = Field(
+    #     ..., ge=0
+    # )  # da li je ovo duplikat, vec ima potreban_broj_igraca?
     # da li nam treba varijabla za trenutni broj igaca?
 
     @validator("max_broj_igraca")

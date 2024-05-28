@@ -13,6 +13,7 @@ import TereniList from './Components/TereniList/TereniList';
 import TerminiList from './Components/TerminiList/TerminiList';
 import TimoviList from './Components/TimoviList/TimoviList';
 import VlasnikList from './Components/VlasnikList/VlasnikList';
+import TerminForm from "./Components/TerminForma/TerminForma";
 
 import './App.css';
 
@@ -49,6 +50,7 @@ function Main() {
         <Route path="/termini" element={<TerminiList />} />
         <Route path="/timovi" element={<TimoviList />} />
         <Route path="/profil" element={<Profil />} />
+        <Route path="/terminForma" element={<TerminForm />} />
       </Routes>
       {!isLoginSignupPage && <Footer />}
     </div>

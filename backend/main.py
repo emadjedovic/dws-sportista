@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends
 from starlette.middleware.cors import CORSMiddleware
-from routers import auth, korisnik, vlasnik, sport
+from routers import auth, korisnik, vlasnik, sport, termin
 
 from database import  engine
 import models
@@ -29,4 +29,5 @@ app.include_router(auth.router)
 app.include_router(korisnik.router)
 app.include_router(vlasnik.router)
 app.include_router(sport.router)
+app.include_router(termin.router)
 
