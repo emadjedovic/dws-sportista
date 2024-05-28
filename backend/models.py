@@ -115,7 +115,7 @@ class Termin(Base):
     vrijeme_pocetka = Column(DateTime, nullable=False)
     vrijeme_kraja = Column(DateTime, nullable=False)
     je_li_privatni = Column(Boolean, nullable=False)
-    broj_slobodnih_mjesta = Column(Integer)
+    # broj_slobodnih_mjesta = Column(Integer) Ima istu svrhu kao i potreban_broj_igraca?
     potreban_broj_igraca = Column(Integer)
     max_broj_igraca = Column(Integer, nullable=False)
     nivo_vjestine = Column(Integer, nullable=False)
