@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react";
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 
-import Home from './Pages/Home/Home';
+//import Home from './Pages/Home/Home';
 import LoginSignup from './Pages/LoginSignup/LoginSignup';
 import Profil from './Pages/Profil/Profil';
 
@@ -43,7 +43,7 @@ function Main() {
       {!isLoginSignupPage && <Header />}
       <Routes>
         <Route path="/" element={<LoginSignup />} />
-        <Route path="/home" element={<Home />} />
+        {/* <Route path="/home" element={<Home />} /> */}
         <Route path="/korisnici" element={<KorisnikList />} />
         <Route path="/vlasnici" element={<VlasnikList />} />
         <Route path="/tereni" element={<TereniList />} />
