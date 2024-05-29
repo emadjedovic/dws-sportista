@@ -12,13 +12,53 @@ from dependencies import get_db
 router = APIRouter()
 
 # Secret key i algoritam za JWT token
-SECRET_KEY = "neki-tajni-kljuc"
+SECRET_KEY = "28ce7ef416bc95f20ad945201344226bd03aaeee7d734fa4d2ce0d14ce2a2084"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 # OAuth2 nosilac lozinke za token autentifikaciju
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+# Funkcija za dekodiranje tokena i dobijanje trenutnog korisnika
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        role: str = payload.get("role")
+        if username is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid authentication credentials",
+            )
+
+        # Provjera je li korisnik ili vlasnik
+        if role == "korisnik":
+            user = db.query(models.Korisnik).filter(models.Korisnik.username == username).first()
+        elif role == "vlasnik":
+            user = db.query(models.Vlasnik).filter(models.Vlasnik.username == username).first()
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid authentication credentials",
+            )
+
+        if user:
+            return {"user":user, "role":role}
+        
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials",
+        )
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials",
+        )
+
+# Trenutni korisnik
+@router.get("/users/me")
+async def read_users_me(current_user: Union[schemas.KorisnikRead, schemas.VlasnikRead] = Depends(get_current_user)):
+    return current_user
 
 #Funkcija za kreiranje JWT pristupnog tokena
 def create_access_token(data: dict):
@@ -27,20 +67,6 @@ def create_access_token(data: dict):
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
-
-
-# Funkcija za dekodiranje i provjeru JWT tokena
-def decode_access_token(token: str):
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        return payload
-    except JWTError:
-        return None
-
-
-@router.get("/items/", tags=["items"])
-async def read_items(token: str = Depends(oauth2_scheme)):
-    return {"token": token}
 
 
 # Registracija korisnika ili vlasnika
@@ -173,6 +199,52 @@ def register_vlasnik(vlasnik_data: schemas.VlasnikCreate, db: Session):
         "is_active": True,  
     }
 
+    #Provjera da li je username zauzet
+    existing_user = (
+        db.query(models.Vlasnik)
+        .filter(models.Vlasnik.username == vlasnik_data.username)
+        .first()
+    )
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Username already registered",
+        )
+
+    # Provjera da li je email vec registrovan
+    existing_email = (
+        db.query(models.Vlasnik)
+        .filter(models.Vlasnik.email == vlasnik_data.email)
+        .first()
+    )
+    if existing_email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered"
+        )
+
+    # Hash-ovanje sifre
+    hashed_password = bcrypt.hashpw(
+        vlasnik_data.password.encode("utf-8"), bcrypt.gensalt()
+    ).decode("utf-8")
+
+    # Kreiranje novog vlasnika
+    novi_vlasnik = models.Vlasnik(
+        password=hashed_password,
+        username = vlasnik_data.username,
+        ime=vlasnik_data.ime,
+        prezime=vlasnik_data.prezime,
+        datum_rodjenja=vlasnik_data.datum_rodjenja,
+        lokacija=vlasnik_data.lokacija,
+        email=vlasnik_data.email,
+        telefon=vlasnik_data.telefon,
+    )
+
+    # Dodavanje vlasnika u bazu
+    db.add(novi_vlasnik)
+    db.commit()
+    db.refresh(novi_vlasnik)
+
+
 
 @router.post("/token", response_model=schemas.Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
@@ -183,7 +255,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
         .first()
     )
     if user and bcrypt.checkpw(form_data.password.encode("utf-8"), user.hashed_password.encode("utf-8")):
-        access_token = create_access_token(data={"sub": user.username})
+        access_token = create_access_token(data={"sub": user.username, "role": "korisnik"})
         return {"access_token": access_token, "token_type": "bearer"}
 
     # Provjera da li je vlasnik
@@ -193,7 +265,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
         .first()
     )
     if vlasnik and bcrypt.checkpw(form_data.password.encode("utf-8"), vlasnik.password.encode("utf-8")):
-        access_token = create_access_token(data={"sub": vlasnik.username})
+        access_token = create_access_token(data={"sub": vlasnik.username, "role": "vlasnik"})
         return {"access_token": access_token, "token_type": "bearer"}
 
     # Ako nije korisnik niti vlasnik 
