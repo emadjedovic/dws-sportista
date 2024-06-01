@@ -199,50 +199,6 @@ def register_vlasnik(vlasnik_data: schemas.VlasnikCreate, db: Session):
         "is_active": True,  
     }
 
-    #Provjera da li je username zauzet
-    existing_user = (
-        db.query(models.Vlasnik)
-        .filter(models.Vlasnik.username == vlasnik_data.username)
-        .first()
-    )
-    if existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Username already registered",
-        )
-
-    # Provjera da li je email vec registrovan
-    existing_email = (
-        db.query(models.Vlasnik)
-        .filter(models.Vlasnik.email == vlasnik_data.email)
-        .first()
-    )
-    if existing_email:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered"
-        )
-
-    # Hash-ovanje sifre
-    hashed_password = bcrypt.hashpw(
-        vlasnik_data.password.encode("utf-8"), bcrypt.gensalt()
-    ).decode("utf-8")
-
-    # Kreiranje novog vlasnika
-    novi_vlasnik = models.Vlasnik(
-        password=hashed_password,
-        username = vlasnik_data.username,
-        ime=vlasnik_data.ime,
-        prezime=vlasnik_data.prezime,
-        datum_rodjenja=vlasnik_data.datum_rodjenja,
-        lokacija=vlasnik_data.lokacija,
-        email=vlasnik_data.email,
-        telefon=vlasnik_data.telefon,
-    )
-
-    # Dodavanje vlasnika u bazu
-    db.add(novi_vlasnik)
-    db.commit()
-    db.refresh(novi_vlasnik)
 
 
 
