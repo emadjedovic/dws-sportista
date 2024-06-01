@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react";
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 
-//import Home from './Pages/Home/Home';
+import Home from './Pages/Home/Home';
 import LoginSignup from './Pages/LoginSignup/LoginSignup';
 import Profil from './Pages/Profil/Profil';
 
@@ -14,6 +14,8 @@ import TerminiList from './Components/TerminiList/TerminiList';
 import TimoviList from './Components/TimoviList/TimoviList';
 import VlasnikList from './Components/VlasnikList/VlasnikList';
 import TerminForm from "./Components/TerminForma/TerminForma";
+import PrivateRoute from './Components/PrivateRoute';
+
 
 import './App.css';
 
@@ -28,9 +30,7 @@ gdje se korisnik prijavljuje/registruje.
 
 function App() {
   return (
-    <Router>
       <Main />
-    </Router>
   );
 }
 
@@ -42,15 +42,17 @@ function Main() {
     <div>
       {!isLoginSignupPage && <Header />}
       <Routes>
-        <Route path="/" element={<LoginSignup />} />
-        {/* <Route path="/home" element={<Home />} /> */}
-        <Route path="/korisnici" element={<KorisnikList />} />
-        <Route path="/vlasnici" element={<VlasnikList />} />
-        <Route path="/tereni" element={<TereniList />} />
-        <Route path="/termini" element={<TerminiList />} />
-        <Route path="/timovi" element={<TimoviList />} />
-        <Route path="/profil" element={<Profil />} />
-        <Route path="/terminForma" element={<TerminForm />} />
+          <Route path="/" element={<LoginSignup />} />
+          <Route element={<PrivateRoute />}>
+            <Route path="/home" element={<Home />} />
+            <Route path="/korisnici" element={<KorisnikList />} />
+            <Route path="/vlasnici" element={<VlasnikList />} />
+            <Route path="/tereni" element={<TereniList />} />
+            <Route path="/termini" element={<TerminiList />} />
+            <Route path="/timovi" element={<TimoviList />} />
+            <Route path="/profil" element={<Profil />} />
+            <Route path="/terminForma" element={<TerminForm />} />
+          </Route>
       </Routes>
       {!isLoginSignupPage && <Footer />}
     </div>

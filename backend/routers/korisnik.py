@@ -22,14 +22,14 @@ def get_korisnici_list(db: Session = Depends(get_db)):
     else:
         raise HTTPException(status_code=404, detail="Not found")
    
-#@router.get("/korisnik/{id}")
-#def get_korisnik_by_id(id: int, db: Session = Depends(get_db)):
-#
-#    korisnik = db.query(models.Korisnik).filter(models.Korisnik.id == id).first()
-#   if not korisnik:
-#       raise HTTPException(status_code=404, detail="Not found")
-#
-#    return korisnik
+@router.get("/korisnik/{id}")
+def get_korisnik_by_id(id: int, db: Session = Depends(get_db)):
+
+    korisnik = db.query(models.Korisnik).filter(models.Korisnik.id == id).first()
+    if not korisnik:
+       raise HTTPException(status_code=404, detail="Not found")
+
+    return korisnik
 
 @router.get("/korisnik/{username}")
 def get_korisnik_by_username(u: str, db: Session = Depends(get_db)):

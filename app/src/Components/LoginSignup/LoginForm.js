@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { FormControl, TextField } from '@mui/material';
 import { useForm } from "react-hook-form";
-import axios from 'axios';
+import { useAuth } from "../../AuthProvider";
 
 import './LoginForm.css'
 
@@ -9,21 +9,14 @@ function LoginForm({ toggleForm, currentFooter }) {
     const [dataIncorrect, setDataIncorrect] = useState(false);
     const { register, handleSubmit, formState: { errors, touchedFields } } = useForm();
 
+    const auth = useAuth();
     const onSubmit = async (data) => {
-        console.log("user data: ", data)
         try {
-            const response = await axios.post('http://localhost:8000/token', data, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-            console.log(response.data);
+            await auth.login(data);
         } catch (error) {
-            if (error.response.status === 400) {
-                setDataIncorrect(true);
-            } else {
                 console.error('Login failed:', error);
-            }
+                setDataIncorrect(true);
+        
         }
     }
 
@@ -36,7 +29,7 @@ function LoginForm({ toggleForm, currentFooter }) {
                     id="username"
                     label="Korisničko ime"
                     name="username"
-                    onChange={() => setDataIncorrect(false)} // Reset dataIncorrect on change
+                    onChange={() => setDataIncorrect(false)} 
                     {...register("username", { required: true })}
                 />
                 <TextField
@@ -46,7 +39,7 @@ function LoginForm({ toggleForm, currentFooter }) {
                     type="password"
                     label="Lozinka"
                     name="password"
-                    onChange={() => setDataIncorrect(false)} // Reset dataIncorrect on change
+                    onChange={() => setDataIncorrect(false)} 
                     {...register("password", { required: true })}
                 />
                 {dataIncorrect && (

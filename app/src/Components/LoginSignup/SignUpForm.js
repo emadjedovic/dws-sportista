@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { FormControl, TextField, Switch } from '@mui/material';
 import SportSelection from './SportSelection';
 import { useForm } from "react-hook-form";
-import axios from 'axios';
+import api from '../../api';
 
 import './SignUpForm.css';
 
@@ -14,19 +14,23 @@ function SignUp({ toggleForm, currentFooter }) {
   const [emailExists, setEmailExists] = useState(false);
 
   const { register, handleSubmit, formState: { errors, touchedFields } } = useForm();
+  useEffect(() => {
+  }, [isPoslovni])
 
   const onSubmit = async (data) => {
     setUsernameTaken(false);
     setEmailExists(false);
     if (!isPoslovni) {
-      data.sportovi = selectedSports;
+      selectedSports.map((sport) => {
+        data.sportovi = selectedSports.map(sport => sport.id);
+      })
     } else {
       delete data.sportovi;
     }
     console.log(data);
     try {
-      const response = await axios.post('http://localhost:8000/register', data);
-      console.log(response.data);
+      const response = await api.post('/register', data);
+      toggleForm();
     } catch (error) {
       if (error.response.status === 400 && error.response.data.detail === "Username already registered") {
         setUsernameTaken(true);
@@ -48,7 +52,7 @@ function SignUp({ toggleForm, currentFooter }) {
           sx={{ margin: '2% auto' }}
           id="username"
           error={usernameTaken}
-          helperText={usernameTaken ? "korisničko ime je zauzeto" : null}
+          helperText={usernameTaken ? "Korisničko ime je zauzeto" : null}
           label="Korisničko ime"
           name="username"
           onChange={() => setUsernameTaken(false)}
